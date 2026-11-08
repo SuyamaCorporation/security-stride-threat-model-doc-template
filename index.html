@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セキュリティSTRIDE脅威モデリングテンプレート</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { background: #0d1117; }
+  .threat-row:hover { background: rgba(255,255,255,0.03); }
+</style>
+</head>
+<body class="min-h-screen text-white p-4">
+<div class="max-w-6xl mx-auto">
+  <div class="flex items-center justify-between mb-3">
+    <div>
+      <h1 class="text-2xl font-bold text-red-300">STRIDE 脅威モデリングテンプレート</h1>
+      <p class="text-gray-400 text-sm">構造化セキュリティ脅威の特定・評価・対策管理</p>
+    </div>
+    <div class="flex gap-2">
+      <button id="btnExport" class="bg-green-600 hover:bg-green-500 px-3 py-2 rounded text-sm font-semibold transition" aria-label="Markdownエクスポート">MD出力</button>
+      <button id="btnClear" class="bg-red-800 hover:bg-red-700 px-3 py-2 rounded text-sm font-semibold transition" aria-label="全データクリア">リセット</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
+    <div class="bg-gray-800 rounded p-2 text-center">
+      <div class="text-red-400 font-bold text-sm">S</div>
+      <div class="text-xs text-gray-400">Spoofing</div>
+    </div>
+    <div class="bg-gray-800 rounded p-2 text-center">
+      <div class="text-orange-400 font-bold text-sm">T</div>
+      <div class="text-xs text-gray-400">Tampering</div>
+    </div>
+    <div class="bg-gray-800 rounded p-2 text-center">
+      <div class="text-yellow-400 font-bold text-sm">R</div>
+      <div class="text-xs text-gray-400">Repudiation</div>
+    </div>
+    <div class="bg-gray-800 rounded p-2 text-center">
+      <div class="text-blue-400 font-bold text-sm">I</div>
+      <div class="text-xs text-gray-400">Info Disclosure</div>
+    </div>
+    <div class="bg-gray-800 rounded p-2 text-center">
+      <div class="text-purple-400 font-bold text-sm">D</div>
+      <div class="text-xs text-gray-400">Denial of Service</div>
+    </div>
+    <div class="bg-gray-800 rounded p-2 text-center">
+      <div class="text-pink-400 font-bold text-sm">E</div>
+      <div class="text-xs text-gray-400">Elevation of Priv.</div>
+    </div>
+  </div>
+
+  <div class="bg-gray-800 rounded-lg p-4 mb-4">
+    <h2 class="text-sm font-semibold text-gray-300 mb-3">脅威エントリを追加</h2>
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-2">
+      <div>
+        <label class="text-xs text-gray-400 block mb-1" for="newCategory">STRIDEカテゴリ</label>
+        <select id="newCategory" class="w-full bg-gray-700 text-white rounded px-2 py-1.5 text-sm" aria-label="STRIDEカテゴリ">
+          <option value="Spoofing">Spoofing</option>
+          <option value="Tampering">Tampering</option>
+          <option value="Repudiation">Repudiation</option>
+          <option value="Information Disclosure">Info Disclosure</option>
+          <option value="Denial of Service">Denial of Service</option>
+          <option value="Elevation of Privilege">Elevation of Priv.</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-gray-400 block mb-1" for="newComponent">コンポーネント</label>
+        <select id="newComponent" class="w-full bg-gray-700 text-white rounded px-2 py-1.5 text-sm" aria-label="コンポーネント">
+          <option value="WebApp">WebApp</option>
+          <option value="API">API</option>
+          <option value="DB">DB</option>
+          <option value="External">External</option>
+        </select>
+      </div>
+      <div class="md:col-span-2">
+        <label class="text-xs text-gray-400 block mb-1" for="newScenario">脅威シナリオ</label>
+        <input type="text" id="newScenario" class="w-full bg-gray-700 text-white rounded px-2 py-1.5 text-sm border border-gray-600 focus:border-red-400 focus:outline-none" placeholder="例: 認証トークン偽造" aria-label="脅威シナリオ">
+      </div>
+      <div>
+        <label class="text-xs text-gray-400 block mb-1" for="newImpact">影響度 (1-5)</label>
+        <select id="newImpact" class="w-full bg-gray-700 text-white rounded px-2 py-1.5 text-sm" aria-label="影響度">
+          <option value="1">1 - 低</option>
+          <option value="2">2</option>
+          <option value="3" selected>3 - 中</option>
+          <option value="4">4</option>
+          <option value="5">5 - 高</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-gray-400 block mb-1" for="newStatus">ステータス</label>
+        <select id="newStatus" class="w-full bg-gray-700 text-white rounded px-2 py-1.5 text-sm" aria-label="ステータス">
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Mitigated">Mitigated</option>
+          <option value="Accepted">Accepted</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2">
+      <div class="md:col-span-4">
+        <label class="text-xs text-gray-400 block mb-1" for="newMitigation">対策</label>
+        <input type="text" id="newMitigation" class="w-full bg-gray-700 text-white rounded px-2 py-1.5 text-sm border border-gray-600 focus:border-red-400 focus:outline-none" placeholder="例: JWTの署名検証を強化" aria-label="対策">
+      </div>
+      <div class="flex items-end">
+        <button id="btnAdd" class="w-full bg-red-600 hover:bg-red-500 px-3 py-1.5 rounded text-sm font-semibold transition" aria-label="脅威エントリ追加">追加</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3 flex gap-3 flex-wrap">
+    <div class="flex gap-2 items-center text-xs text-gray-400">
+      フィルター:
+      <select id="filterCategory" class="bg-gray-700 text-white rounded px-2 py-1 text-xs" aria-label="カテゴリフィルター">
+        <option value="">全カテゴリ</option>
+        <option value="Spoofing">Spoofing</option>
+        <option value="Tampering">Tampering</option>
+        <option value="Repudiation">Repudiation</option>
+        <option value="Information Disclosure">Info Disclosure</option>
+        <option value="Denial of Service">Denial of Service</option>
+        <option value="Elevation of Privilege">Elevation of Priv.</option>
+      </select>
+      <select id="filterComponent" class="bg-gray-700 text-white rounded px-2 py-1 text-xs" aria-label="コンポーネントフィルター">
+        <option value="">全コンポーネント</option>
+        <option value="WebApp">WebApp</option>
+        <option value="API">API</option>
+        <option value="DB">DB</option>
+        <option value="External">External</option>
+      </select>
+      <select id="filterStatus" class="bg-gray-700 text-white rounded px-2 py-1 text-xs" aria-label="ステータスフィルター">
+        <option value="">全ステータス</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Mitigated">Mitigated</option>
+        <option value="Accepted">Accepted</option>
+      </select>
+    </div>
+    <div id="summary" class="text-xs text-gray-400"></div>
+  </div>
+
+  <div class="bg-gray-900 rounded-xl border border-gray-700 overflow-hidden">
+    <table class="w-full text-xs" role="table" aria-label="STRIDE脅威リスト">
+      <thead>
+        <tr class="bg-gray-800 text-gray-400">
+          <th class="px-3 py-2 text-left">#</th>
+          <th class="px-3 py-2 text-left">カテゴリ</th>
+          <th class="px-3 py-2 text-left">コンポーネント</th>
+          <th class="px-3 py-2 text-left">脅威シナリオ</th>
+          <th class="px-3 py-2 text-center">影響度</th>
+          <th class="px-3 py-2 text-left">対策</th>
+          <th class="px-3 py-2 text-center">ステータス</th>
+          <th class="px-3 py-2 text-center">操作</th>
+        </tr>
+      </thead>
+      <tbody id="threatTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="exportModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-label="Markdownエクスポート">
+  <div class="bg-gray-800 rounded-xl p-5 max-w-3xl w-full mx-4 max-h-screen overflow-y-auto">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="text-lg font-semibold text-green-300">Markdownエクスポート</h3>
+      <button id="btnCloseModal" class="text-gray-400 hover:text-white text-xl" aria-label="モーダルを閉じる">×</button>
+    </div>
+    <textarea id="exportText" class="w-full bg-gray-900 text-green-300 font-mono text-xs p-3 rounded border border-gray-600 h-96" readonly aria-label="エクスポートテキスト"></textarea>
+    <button id="btnCopy" class="mt-2 bg-green-600 hover:bg-green-500 px-3 py-2 rounded text-sm font-semibold transition" aria-label="コピー">クリップボードにコピー</button>
+  </div>
+</div>
+
+<script>
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+(function() {
+  const STRIDE_COLORS = {
+    'Spoofing': 'text-red-400 bg-red-900',
+    'Tampering': 'text-orange-400 bg-orange-900',
+    'Repudiation': 'text-yellow-400 bg-yellow-900',
+    'Information Disclosure': 'text-blue-400 bg-blue-900',
+    'Denial of Service': 'text-purple-400 bg-purple-900',
+    'Elevation of Privilege': 'text-pink-400 bg-pink-900'
+  };
+  const STATUS_COLORS = {
+    'Open': 'bg-red-700 text-red-100',
+    'In Progress': 'bg-yellow-700 text-yellow-100',
+    'Mitigated': 'bg-green-700 text-green-100',
+    'Accepted': 'bg-gray-600 text-gray-200'
+  };
+
+  const STORAGE_KEY = 'stride-threats-v1';
+  let threats = [];
+
+  function load() {
+    try {
+      threats = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if (!Array.isArray(threats)) threats = [];
+    } catch { threats = []; }
+    if (threats.length === 0) {
+      threats = [
+        { id: 1, category: 'Spoofing', component: 'WebApp', scenario: 'セッショントークンの偽造によるユーザーなりすまし', impact: 5, mitigation: 'セキュアなJWT署名・httpOnly Cookie・CSRFトークン導入', status: 'In Progress' },
+        { id: 2, category: 'Tampering', component: 'API', scenario: 'APIリクエストパラメータの改ざんによるデータ操作', impact: 4, mitigation: '入力バリデーション・SQLパラメータ化クエリ・HMACによるリクエスト署名', status: 'Open' },
+        { id: 3, category: 'Information Disclosure', component: 'DB', scenario: 'SQLインジェクションによる個人情報漏洩', impact: 5, mitigation: 'ORM使用・最小権限DB接続・暗号化保存', status: 'Mitigated' },
+        { id: 4, category: 'Denial of Service', component: 'API', scenario: 'レートリミット不足によるAPIサービス拒否', impact: 3, mitigation: 'レートリミット実装・CDN WAF設定', status: 'Open' }
+      ];
+      save();
+    }
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(threats));
+  }
+
+  function nextId() {
+    return (Math.max(0, ...threats.map(t => t.id)) + 1);
+  }
+
+  function getFilters() {
+    return {
+      category: document.getElementById('filterCategory').value,
+      component: document.getElementById('filterComponent').value,
+      status: document.getElementById('filterStatus').value
+    };
+  }
+
+  function filteredThreats() {
+    const { category, component, status } = getFilters();
+    return threats.filter(t =>
+      (!category || t.category === category) &&
+      (!component || t.component === component) &&
+      (!status || t.status === status)
+    );
+  }
+
+  function impactBar(n) {
+    return Array(5).fill(0).map((_, i) =>
+      `<span class="inline-block w-3 h-3 rounded-sm mx-0.5 ${i < n ? 'bg-red-500' : 'bg-gray-600'}"></span>`
+    ).join('');
+  }
+
+  function render() {
+    const tbody = document.getElementById('threatTable');
+    const list = filteredThreats();
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-gray-500 py-8">脅威エントリがありません</td></tr>';
+    } else {
+      tbody.innerHTML = list.map((t, i) => {
+        const catCls = STRIDE_COLORS[t.category] || 'text-gray-300 bg-gray-700';
+        const stsCls = STATUS_COLORS[t.status] || 'bg-gray-600 text-gray-200';
+        return `<tr class="threat-row border-t border-gray-700" role="row">
+          <td class="px-3 py-2 text-gray-500">${i+1}</td>
+          <td class="px-3 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-semibold ${catCls}">${t.category.replace(' Disclosure','').replace('Elevation of ','').replace('Denial of ','DoS ')}</span></td>
+          <td class="px-3 py-2"><span class="text-cyan-300">${esc(t.component)}</span></td>
+          <td class="px-3 py-2 text-gray-200 max-w-xs">${esc(t.scenario)}</td>
+          <td class="px-3 py-2 text-center">${impactBar(t.impact)}</td>
+          <td class="px-3 py-2 text-gray-400 max-w-xs">${esc(t.mitigation)}</td>
+          <td class="px-3 py-2 text-center"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${stsCls}">${t.status}</span></td>
+          <td class="px-3 py-2 text-center">
+            <button class="btn-delete text-red-500 hover:text-red-300 font-mono text-sm" data-id="${t.id}" aria-label="削除">✕</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    const open = threats.filter(t => t.status === 'Open').length;
+    const high = threats.filter(t => t.impact >= 4).length;
+    document.getElementById('summary').textContent =
+      `合計: ${threats.length}件 | Open: ${open}件 | 高影響(4-5): ${high}件`;
+
+    tbody.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = parseInt(this.dataset.id);
+        threats = threats.filter(t => t.id !== id);
+        save(); render();
+      });
+    });
+  }
+
+  document.getElementById('btnAdd').addEventListener('click', function() {
+    const scenario = document.getElementById('newScenario').value.trim();
+    if (!scenario) { document.getElementById('newScenario').focus(); return; }
+    threats.push({
+      id: nextId(),
+      category: document.getElementById('newCategory').value,
+      component: document.getElementById('newComponent').value,
+      scenario,
+      impact: parseInt(document.getElementById('newImpact').value),
+      mitigation: document.getElementById('newMitigation').value.trim() || '(未設定)',
+      status: document.getElementById('newStatus').value
+    });
+    save(); render();
+    document.getElementById('newScenario').value = '';
+    document.getElementById('newMitigation').value = '';
+  });
+
+  ['filterCategory','filterComponent','filterStatus'].forEach(id => {
+    document.getElementById(id).addEventListener('change', render);
+  });
+
+  document.getElementById('btnClear').addEventListener('click', function() {
+    if (confirm('全データをリセットしますか？')) {
+      threats = [];
+      localStorage.removeItem(STORAGE_KEY);
+      load(); render();
+    }
+  });
+
+  document.getElementById('btnExport').addEventListener('click', function() {
+    const lines = ['# STRIDE 脅威モデリングレポート', '', `生成日時: ${new Date().toLocaleString('ja-JP')}`, '', '---', ''];
+    const categories = ['Spoofing','Tampering','Repudiation','Information Disclosure','Denial of Service','Elevation of Privilege'];
+    categories.forEach(cat => {
+      const list = threats.filter(t => t.category === cat);
+      if (list.length === 0) return;
+      lines.push(`## ${cat}`, '');
+      lines.push('| # | コンポーネント | 脅威シナリオ | 影響度 | 対策 | ステータス |');
+      lines.push('|---|---|---|---|---|---|');
+      list.forEach((t, i) => {
+        lines.push(`| ${i+1} | ${t.component} | ${t.scenario} | ${t.impact}/5 | ${t.mitigation} | ${t.status} |`);
+      });
+      lines.push('');
+    });
+    lines.push('---');
+    lines.push(`合計: ${threats.length}件 | Open: ${threats.filter(t=>t.status==='Open').length}件 | 高影響: ${threats.filter(t=>t.impact>=4).length}件`);
+    document.getElementById('exportText').value = lines.join('\n');
+    document.getElementById('exportModal').classList.remove('hidden');
+  });
+
+  document.getElementById('btnCloseModal').addEventListener('click', function() {
+    document.getElementById('exportModal').classList.add('hidden');
+  });
+  document.getElementById('exportModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+  });
+  document.getElementById('btnCopy').addEventListener('click', function() {
+    navigator.clipboard.writeText(document.getElementById('exportText').value)
+      .then(() => { this.textContent = 'コピー完了!'; setTimeout(() => { this.textContent = 'クリップボードにコピー'; }, 1500); });
+  });
+
+  load(); render();
+})();
+</script>
+</body>
+</html>
